@@ -1,0 +1,49 @@
+Simple Web Stack Infrastructure Design
+=====================================
+
+**Scenario:**
+A user wants to access the website at `www.foobar.com`.
+
+**Step-by-step Explanation:**
+1. The user enters `www.foobar.com` in their browser.
+2. The browser queries DNS to resolve `www.foobar.com` to an IP address (8.8.8.8).
+3. The browser sends an HTTP request to 8.8.8.8.
+4. The request reaches the server at 8.8.8.8, which runs Nginx (web server).
+5. Nginx forwards the request to the application server (e.g., PHP-FPM for PHP apps).
+6. The application server executes the code (application files), possibly querying the MySQL database.
+7. The application server returns the response to Nginx, which sends it back to the user's browser.
+
+**Infrastructure Components:**
+- **1 server:** Hosts all components (web server, application server, application files, database).
+- **1 web server (Nginx):** Handles HTTP requests, serves static files, and forwards dynamic requests to the application server.
+- **1 application server:** Runs the application code (e.g., PHP-FPM, Gunicorn for Python, etc.).
+- **1 set of application files:** The website's codebase.
+- **1 database (MySQL):** Stores persistent data for the application.
+- **1 domain name (`foobar.com`) with a `www` record:** Points to 8.8.8.8 (the server's IP).
+
+**Specific Explanations:**
+- **What is a server?**
+  A server is a powerful computer that provides services, resources, or data to other computers (clients) over a network.
+
+- **Role of the domain name:**
+  The domain name (foobar.com) is a human-readable address that maps to the server's IP, making it easier for users to access the website.
+
+- **Type of DNS record for `www` in `www.foobar.com`:**
+  The `www` is a subdomain, typically set up as an A record (points directly to an IP) or a CNAME (alias to another domain).
+
+- **Role of the web server (Nginx):**
+  Receives HTTP requests, serves static content, and forwards dynamic requests to the application server.
+
+- **Role of the application server:**
+  Processes dynamic requests, runs the application code, and interacts with the database as needed.
+
+- **Role of the database (MySQL):**
+  Stores and manages the application's data.
+
+- **How does the server communicate with the user's computer?**
+  Through the HTTP protocol over the internet (TCP/IP).
+
+**Issues with this Infrastructure:**
+- **SPOF (Single Point of Failure):** If the server fails, the website becomes unavailable.
+- **Downtime for maintenance:** Any updates or restarts (e.g., deploying new code, restarting Nginx) cause downtime.
+- **Scalability:** Cannot handle high traffic; performance degrades as load increases. 

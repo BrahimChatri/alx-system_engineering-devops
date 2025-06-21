@@ -1,0 +1,46 @@
+Secured and Monitored Web Infrastructure Design
+==============================================
+
+**Scenario:**
+A user wants to access the website at `www.foobar.com` securely and reliably.
+
+**Step-by-step Explanation:**
+1. The user enters `https://www.foobar.com` in their browser.
+2. The browser queries DNS to resolve `www.foobar.com` to the load balancer's IP.
+3. The browser establishes an HTTPS connection (SSL/TLS) to the load balancer.
+4. The load balancer (HAProxy) terminates SSL and forwards the request to one of the web servers (Nginx) over a secure internal network.
+5. The web server forwards the request to the application server.
+6. The application server processes the request, possibly querying the MySQL database.
+7. The application server returns the response to the web server, which sends it back to the load balancer, and then to the user's browser.
+8. Monitoring clients on each server collect and send metrics/logs to a monitoring service (e.g., Sumologic).
+
+**Infrastructure Components:**
+- **3 servers:** For web, application, and database roles.
+- **3 firewalls:** Protect each server, allowing only necessary traffic (e.g., HTTP/HTTPS, DB connections).
+- **1 SSL certificate:** Enables HTTPS for secure communication between users and the load balancer.
+- **3 monitoring clients:** Collect and send logs/metrics to a monitoring service.
+
+**Why add each element?**
+- **Firewalls:** Restrict access to only required ports/services, improving security.
+- **SSL certificate:** Encrypts traffic, protecting user data and privacy.
+- **Monitoring clients:** Provide visibility into system health, performance, and security.
+
+**What are firewalls for?**
+Firewalls control incoming and outgoing network traffic, blocking unauthorized access and attacks.
+
+**Why is the traffic served over HTTPS?**
+HTTPS encrypts data in transit, preventing eavesdropping and tampering.
+
+**What is monitoring used for?**
+Monitoring tracks system health, performance, and security, enabling quick detection and response to issues.
+
+**How does the monitoring tool collect data?**
+Monitoring clients (agents) run on each server, collecting logs, metrics, and events, and sending them to a central monitoring service.
+
+**How to monitor web server QPS (Queries Per Second)?**
+Configure the monitoring client to collect and report web server metrics, including QPS, using logs or server status endpoints.
+
+**Issues with this Infrastructure:**
+- **SSL termination at the load balancer:** Internal traffic between the load balancer and backend servers is unencrypted, which could be a security risk.
+- **Single MySQL write server:** If the primary database fails, no writes can be performed, risking data loss or downtime.
+- **All-in-one servers:** If each server runs all components, a compromise or failure affects the entire stack, reducing isolation and security. 

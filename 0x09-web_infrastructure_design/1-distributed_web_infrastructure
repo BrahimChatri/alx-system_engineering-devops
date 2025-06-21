@@ -1,0 +1,43 @@
+Distributed Web Infrastructure Design
+====================================
+
+**Scenario:**
+A user wants to access the website at `www.foobar.com`.
+
+**Step-by-step Explanation:**
+1. The user enters `www.foobar.com` in their browser.
+2. The browser queries DNS to resolve `www.foobar.com` to an IP address (e.g., 8.8.8.8).
+3. The browser sends an HTTP request to the load balancer at 8.8.8.8.
+4. The load balancer (HAProxy) distributes the request to one of the web servers (Nginx).
+5. The web server forwards the request to the application server.
+6. The application server processes the request, possibly querying the MySQL database.
+7. The application server returns the response to the web server, which sends it back to the load balancer, and then to the user's browser.
+
+**Infrastructure Components:**
+- **2 servers:** Host the web server and application server (can be on the same or separate machines).
+- **1 web server (Nginx):** Handles HTTP requests, serves static files, and forwards dynamic requests to the application server.
+- **1 application server:** Runs the application code.
+- **1 load balancer (HAProxy):** Distributes incoming traffic between the web servers.
+- **1 set of application files:** The website's codebase, deployed on both servers.
+- **1 database (MySQL):** Stores persistent data for the application.
+
+**Why add each element?**
+- **Load balancer:** Distributes traffic, improves availability and scalability.
+- **Multiple servers:** Reduces SPOF, allows for better load handling.
+
+**Load Balancer Distribution Algorithm:**
+- **Round Robin:** Each incoming request is sent to the next server in a list, cycling through all servers. This balances the load evenly.
+
+**Active-Active vs. Active-Passive:**
+- **Active-Active:** All backend servers handle requests simultaneously (used here).
+- **Active-Passive:** Only one server is active; others are on standby for failover.
+
+**Database Primary-Replica (Master-Slave) Cluster:**
+- **Primary node:** Handles all write operations.
+- **Replica node:** Handles read operations and replicates data from the primary.
+- **Difference:** The application writes to the primary and can read from both, improving performance and redundancy.
+
+**Issues with this Infrastructure:**
+- **SPOF:** The load balancer and the database are still single points of failure.
+- **Security:** No firewall or HTTPS; vulnerable to attacks.
+- **No monitoring:** Failures or performance issues may go undetected. 
