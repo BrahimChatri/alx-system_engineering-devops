@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+Host myserver
+    HostName 127.0.0.1
+    User ubuntu
+    IdentityFile ~/.ssh/school
+    PasswordAuthentication no
