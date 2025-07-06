@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-# Sets up a web server with Nginx to serve "Hello World!"
+# Bash script that installs and configures nginx web server
 
-# Exit on any error
-set -e
+# Update package list
+apt-get update -y
 
 # Install nginx
-apt-get update -y
 apt-get install nginx -y
 
 # Create a simple HTML page with "Hello World!"
-echo "Hello World!" > /var/www/html/index.nginx-debian.html
+echo "Hello World!" > /var/www/html/index.html
 
-# Reload nginx without using systemctl
-service nginx restart
+# Start nginx service
+service nginx start
+
+# Enable nginx to start on boot
+update-rc.d nginx enable
