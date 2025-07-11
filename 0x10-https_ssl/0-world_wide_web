@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Script that displays information about subdomains
+
+# Function to get subdomain information
+get_subdomain_info() {
+    local domain="$1"
+    local subdomain="$2"
+    
+    # Use dig to get DNS information and parse with awk
+    # shellcheck disable=SC2086
+    dig "$subdomain.$domain" | awk '/ANSWER SECTION:/{getline; print}' | awk '{
+        if (NF >= 4) {
+            record_type = $4
+            destination = $5
+            print "The subdomain " subdomain " is a " record_type " record and points to " destination
+        }
+    }' subdomain="$subdomain"
+}
+
+# Main script logic
+domain="$1"
+subdomain="$2"
+
+# Check if domain parameter is provided
+if [ -z "$domain" ]; then
+    echo "Usage: $0 domain [subdomain]"
+    exit 1
+fi
+
+# If subdomain is provided, show info for that specific subdomain
+if [ -n "$subdomain" ]; then
+    get_subdomain_info "$domain" "$subdomain"
+else
+    # Show info for default subdomains in specified order
+    for sub in www lb-01 web-01 web-02; do
+        get_subdomain_info "$domain" "$sub"
+    done
+fi
