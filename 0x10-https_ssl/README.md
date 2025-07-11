@@ -123,6 +123,58 @@ curl -I https://www.yourdomain.com
 curl https://www.yourdomain.com
 ```
 
+## Task 2: No Loophole in Website Traffic (100-redirect_http_to_https)
+
+### Description
+Advanced HAproxy configuration that enforces HTTPS traffic by automatically redirecting all HTTP requests to HTTPS. This ensures no unencrypted traffic is possible.
+
+### Features
+- **Automatic HTTP to HTTPS Redirect**: All HTTP traffic is redirected to HTTPS with 301 status code
+- **Transparent to User**: Redirection happens seamlessly without user intervention
+- **Enhanced Security**: Prevents any unencrypted traffic from reaching the backend
+- **SEO Friendly**: Uses 301 permanent redirect status code
+- **Additional Security Headers**: Includes XSS protection and other security headers
+
+### Requirements Met
+- ✅ Transparent to the user
+- ✅ HAproxy returns a 301 status code
+- ✅ HAproxy redirects HTTP traffic to HTTPS
+- ✅ Configuration file provided as `100-redirect_http_to_https`
+- ✅ No loophole for unencrypted traffic
+
+### HTTP to HTTPS Redirect Behavior
+```bash
+# Example curl command showing the redirect
+curl -sIL http://www.holberton.online
+
+# Expected output:
+# HTTP/1.1 301 Moved Permanently
+# Content-length: 0
+# Location: https://www.holberton.online/
+# Connection: close
+#
+# HTTP/1.1 200 OK
+# Server: nginx/1.4.6 (Ubuntu)
+# ...
+```
+
+### Key Configuration Features
+- **Port 80 Frontend**: Exclusively handles HTTP to HTTPS redirection
+- **Port 443 Frontend**: Handles all HTTPS traffic with SSL termination
+- **301 Redirect**: Permanent redirect ensures SEO benefits
+- **Security Headers**: HSTS, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection
+- **Let's Encrypt Support**: ACL for certificate renewal challenges
+
+## Files
+
+- `0-world_wide_web` - Bash script for subdomain information
+- `1-haproxy_ssl_termination` - HAproxy SSL configuration
+- `1-haproxy_ssl_termination.example` - Example configuration with sample IPs
+- `100-redirect_http_to_https` - Advanced HAproxy config with HTTP to HTTPS redirection
+- `100-redirect_http_to_https.template` - Template version with placeholder IPs
+- `SETUP_GUIDE.md` - Comprehensive setup instructions
+- `README.md` - This documentation
+
 ## Repository Structure
 ```
 alx-system_engineering-devops/
@@ -130,6 +182,9 @@ alx-system_engineering-devops/
     ├── 0-world_wide_web
     ├── 1-haproxy_ssl_termination
     ├── 1-haproxy_ssl_termination.example
+    ├── 100-redirect_http_to_https
+    ├── 100-redirect_http_to_https.template
     ├── SETUP_GUIDE.md
-    └── README.md
+    ├── README.md
+    └── TASK_COMPLETION.md
 ```
