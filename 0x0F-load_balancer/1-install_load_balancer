@@ -1,6 +1,52 @@
 #!/usr/bin/env bash
-#Double the number of webservers
-sudo apt update
-sudo apt install haproxy -y
-sudo sh -c 'echo "\nlisten myserver\n\tbind *:80\n\tbalance roundrobin\n\tserver server1 18.207.1.87:80 check\n\tserver server2 52.206.189.175:80 check\n" >> /etc/haproxy/haproxy.cfg'
-sudo service haproxy restart
+# Script to install and configure HAProxy load balancer
+
+# Exit immediately if a command fails
+set -e
+
+# Update packages
+apt-get update -y
+
+# Install HAProxy
+apt-get install -y haproxy
+
+# Enable HAProxy to start on boot
+systemctl enable haproxy
+
+# Backup default config
+cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
+
+# Configure HAProxy
+cat <<EOF > /etc/haproxy/haproxy.cfg
+# Global settings
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    daemon
+
+# Default settings
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
+
+# Frontend for HTTP traffic
+frontend http_front
+    bind *:80
+    default_backend http_back
+
+# Backend web servers
+backend http_back
+    balance roundrobin
+    server web-01 44.202.47.210:80 check
+    server web-02 3.93.215.54:80 check
+EOF
+
+# Restart HAProxy to apply configuration
+systemctl restart haproxy
+
+echo "HAProxy installation and configuration complete!"
