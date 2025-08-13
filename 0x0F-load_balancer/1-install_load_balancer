@@ -1,15 +1,58 @@
 #!/usr/bin/env bash
-# Install HAProxy and configure load balancing
+# Install and configure HAproxy for load balancing between web-01 and web-02
 
-sudo apt update
-sudo apt install -y haproxy
+# Update package list
+apt-get update -y
 
-sudo sh -c 'echo "\nlisten myserver
+# Install HAproxy
+apt-get install -y haproxy
+
+# Enable HAproxy init script
+systemctl enable haproxy
+
+# Backup original configuration
+cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup
+
+# Create HAproxy configuration
+cat > /etc/haproxy/haproxy.cfg << 'EOF'
+global
+    daemon
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+
+defaults
+    mode http
+    timeout connect 5000ms
+    timeout client 50000ms
+    timeout server 50000ms
+    option httplog
+    option dontlognull
+    errorfile 400 /etc/haproxy/errors/400.http
+    errorfile 403 /etc/haproxy/errors/403.http
+    errorfile 408 /etc/haproxy/errors/408.http
+    errorfile 500 /etc/haproxy/errors/500.http
+    errorfile 502 /etc/haproxy/errors/502.http
+    errorfile 503 /etc/haproxy/errors/503.http
+    errorfile 504 /etc/haproxy/errors/504.http
+
+frontend web_frontend
     bind *:80
-    balance roundrobin
-    server server1 44.202.47.210:80 check
-    server server2 3.93.215.54:80 check
-" >> /etc/haproxy/haproxy.cfg'
+    default_backend web_servers
 
-sudo systemctl restart haproxy
-sudo systemctl enable haproxy
+backend web_servers
+    balance roundrobin
+    server 1264987-web-01 44.202.47.210:80 check
+    server 1264987-web-02 3.93.215.54:80 check
+EOF
+
+# Test HAproxy configuration
+haproxy -c -f /etc/haproxy/haproxy.cfg
+
+# Start HAproxy service
+service haproxy start
+
+# Enable HAproxy to start on boot (already done above, but ensuring)
+systemctl enable haproxy
